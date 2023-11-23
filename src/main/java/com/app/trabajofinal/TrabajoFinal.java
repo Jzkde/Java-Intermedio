@@ -3,28 +3,30 @@ package com.app.trabajofinal;
 
 import org.hibernate.Session;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.swing.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
 public class TrabajoFinal {
 
-    String desc = JOptionPane.showInputDialog("Ingrese la Descripcion");
-    float costo = Float.parseFloat(JOptionPane.showInputDialog("Ingrese el Costo"));
-    String fechaStr = JOptionPane.showInputDialog("Ingrese la fecha desde con el siguiente formato (YYYY-MM-DD)");
-    Date fecha = Date.from(Instant.parse(fechaStr));
-    String desdeStr = JOptionPane.showInputDialog("Ingrese la fecha desde con el siguiente formato (YYYY-MM-DD)");
-    String hastaStr = JOptionPane.showInputDialog("Ingrese la fecha hasta con el siguiente formato (YYYY-MM-DD)");
+//    String desc = JOptionPane.showInputDialog("Ingrese la Descripcion");
+//    float costo = Float.parseFloat(JOptionPane.showInputDialog("Ingrese el Costo"));
+//    String fechaStr = JOptionPane.showInputDialog("Ingrese la fecha desde con el siguiente formato (YYYY-MM-DD)");
+//  Date fecha = Date.from(Instant.parse(fechaStr));
+//    String desdeStr = JOptionPane.showInputDialog("Ingrese la fecha desde con el siguiente formato (YYYY-MM-DD)");
+//    String hastaStr = JOptionPane.showInputDialog("Ingrese la fecha hasta con el siguiente formato (YYYY-MM-DD)");
 
 //    Date desde = Date.from(Instant.parse(desdeStr));
 //    Date hasta = Date.from(Instant.parse(hastaStr));
-    Date desde = Date.from(LocalDate.parse(desdeStr).atStartOfDay(ZoneId.systemDefault()).toInstant());
-    Date hasta = Date.from(LocalDate.parse(hastaStr).atStartOfDay(ZoneId.systemDefault()).toInstant());
+//    Date desde = Date.from(LocalDate.parse(desdeStr).atStartOfDay(ZoneId.systemDefault()).toInstant());
+//    Date hasta = Date.from(LocalDate.parse(hastaStr).atStartOfDay(ZoneId.systemDefault()).toInstant());
 
 
     public static void main(String[] args) {
@@ -37,9 +39,9 @@ public class TrabajoFinal {
 
 
     public void ejemplo2() {
-        createAndStoreEvent("El Event");
         listas();
-       // listEvents();
+        createAndStoreEvent("El Event");
+        listEvents();
         HibernateUtil.getSessionFactory().close();
     }
 
@@ -47,18 +49,31 @@ public class TrabajoFinal {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
+        Categoria cat = new Categoria();
+        cat.setDesc_categoria("servicio");
+
+        Tecnico tec = new Tecnico();
+        tec.setNombre_tecnico("alguien que sabe");
 
         Incidencia inc = new Incidencia();
+        inc.setEstado(true);;
+        inc.setCosto(123);
+        inc.setDesc_incidencia("algo paso");
+        inc.setFecha_incidencia(LocalDate.now());
+        inc.addCategoria(cat);
+        inc.addTecnico(tec);
 
-        inc.setDesc_incidencia(desc);
-        inc.setCosto(costo);
-        inc.setFecha_incidencia(fecha);
-        inc.setEstado(true);
-//        inc.setId_categoria(categoria);
-//        inc.setId_tecnico(tecnico);
+        Cliente cli = new Cliente();
+        cli.setDni(143);
+        cli.setMail("n@n.com");
+        cli.setDireccion("un lugar");
+        cli.setNombre("alguien");
+        cli.addIncidencia(inc);
 
+        session.save(cli);
         session.save(inc);
-
+        session.save(tec);
+        session.save(cat);
         session.getTransaction().commit();
 
     }
@@ -77,17 +92,32 @@ public class TrabajoFinal {
 
     }
 
+
+    private void listEvents() {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List<Incidencia> result = (List<Incidencia>)session.createQuery("from Incidencia").list();
+        session.getTransaction().commit();
+        for (Incidencia e : result) {
+            System.out.println("Descripcion: " + e.getDesc_incidencia() + "/ Fecha: " + e.getFecha_incidencia() + "/ Costo: "
+                   + e.getCosto() + "/ Categoria: " + e.getCategorias() + "/ Tecnico: "
+                  + e.getTecnicos() + "/ Cliente: " + e.getCliente().getNombre());
+        }
+
+    }
+
+
 //    private void listEvents() {
 //        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 //        session.beginTransaction();
 //        List<Incidencia> result = (List<Incidencia>) session.createQuery("from Incidencia").list();
 //        session.getTransaction().commit();
-//        List<Incidencia> filteredList = result.stream().filter(incidencia -> incidencia.getFecha_incidencia().after(desde) && incidencia.getFecha_incidencia().before(hasta))
-//                .collect(Collectors.toList());
+////        List<Incidencia> filteredList = result.stream().filter(incidencia -> incidencia.getFecha_incidencia().after(desde) && incidencia.getFecha_incidencia().before(hasta))
+////                .collect(Collectors.toList());
 //        for (Incidencia e : result) {
 //            System.out.println("Descripcion: " + e.getDesc_incidencia() + "/ Fecha: " + e.getFecha_incidencia() + "/ Costo: "
-//                    + e.getCosto() + "/ Categoria: " + e.getId_categoria().getDesc_categoria() + "/ Tecnico: "
-//                    + e.getId_tecnico().getNombre_tecnico() + "/ Cliente: " + e.getDni().getNombre());
+//                    + e.getCosto() + "/ Categoria: " + e.getCategorias() + "/ Tecnico: "
+//                    + e.getTecnicos() + "/ Cliente: " + e.getCliente().getNombre());
 //
 //        }
 //    }

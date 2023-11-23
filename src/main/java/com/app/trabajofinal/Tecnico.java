@@ -1,4 +1,3 @@
-
 package com.app.trabajofinal;
 
 import lombok.Getter;
@@ -8,17 +7,16 @@ import javax.persistence.*;
 
 
 @Entity
-@Getter @Setter
-// Defines the name of the table created for the entity
-@Table(name = "Tecnico")
+@Getter
+@Setter
 public class Tecnico {
     @Id
-    @Column(name = "id_tecnico", unique = true)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id_tecnico;
-    @Column(name = "nombre_tecnico", nullable = false)
     private String nombre_tecnico;
 
-    @OneToOne(mappedBy = "id_tecnico",fetch = FetchType.EAGER)
+    @JoinColumn(name = "incidencia_id")
+    @ManyToOne(fetch = FetchType.EAGER)
     private Incidencia incidencia;
 
 }
