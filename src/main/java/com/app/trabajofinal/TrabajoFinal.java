@@ -20,16 +20,17 @@ public class TrabajoFinal {
 
 
     public void ejemplo2() {
-        createAndStoreEvent("El Event");
+//         createAndStoreEvent("El Event");
         int dni = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el DNI del Cliente"));
         getClienteByDni(dni);
-      //  listEvents();
+//         listEvents();
         HibernateUtil.getSessionFactory().close();
     }
 
     private void createAndStoreEvent(String title) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
+
         Categoria cat = new Categoria();
         cat.setDesc_categoria("servicio");
 
@@ -41,52 +42,55 @@ public class TrabajoFinal {
         inc.setCosto(123);
         inc.setDesc_incidencia("algo paso");
         inc.setFecha_incidencia(LocalDate.now());
-        inc.addCategoria(cat);
-        inc.addTecnico(tec);
 
         Cliente cli = new Cliente();
         cli.setDni(143);
         cli.setMail("n@n.com");
         cli.setDireccion("un lugar");
         cli.setNombre("alguien");
+
+        cat.addIncidencia(inc);
+        tec.addIncidencia(inc);
         cli.addIncidencia(inc);
 
-//        session.save(cli);
-//        session.save(inc);
-//        session.save(tec);
-//        session.save(cat);
+        session.save(cli);
+        session.save(inc);
+        session.save(tec);
+        session.save(cat);
 
         session.getTransaction().commit();
-
-
     }
-
 
     private void listEvents() {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        List<Incidencia> result = (List<Incidencia>) session.createQuery("from Incidencia").list();
+
+        List<Incidencia> result = session.createQuery("FROM Incidencia i JOIN FETCH i.tecnico", Incidencia.class).list();
+
         session.getTransaction().commit();
+
         for (Incidencia e : result) {
-            System.out.println("Descripcion: " + e.getDesc_incidencia() + "/ Fecha: " + e.getFecha_incidencia() + "/ Costo: "
-                    + e.getCosto() + "/ Categoria: " + e.getCategorias() + "/ Tecnico: "
-                    + e.getTecnicos() + "/ Cliente: " + e.getCliente().getNombre());
+            System.out.println(
+                    "/ Cliente: " + e.getCliente().getNombre() +
+                            "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
+                            "/ Fecha: " + e.getFecha_incidencia() +
+                            "/ Categoria: " + e.getCategoria().getDesc_categoria());
         }
-
     }
-
 
     private Cliente getClienteByDni(int dni) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
         Cliente cliente = session.get(Cliente.class, dni);
-
         Categoria cat = session.get(Categoria.class, 1);
         Tecnico tec = session.get(Tecnico.class, 1);
 
 
         if (cliente != null) {
+        } else {
+            System.out.println("Cliente con DNI: " + dni + " encontrado");
+
             float costo = Float.parseFloat(JOptionPane.showInputDialog("Ingrese el costo de reparacion"));
             String desc = JOptionPane.showInputDialog("Describa el problema");
             Incidencia inc = new Incidencia();
@@ -94,8 +98,10 @@ public class TrabajoFinal {
             inc.setCosto(costo);
             inc.setDesc_incidencia(desc);
             inc.setFecha_incidencia(LocalDate.now());
-            inc.addCategoria(cat);
-            inc.addTecnico(tec);
+
+
+            cat.addIncidencia(inc);
+            tec.addIncidencia(inc);
             cliente.addIncidencia(inc);
 
             session.save(inc);
@@ -104,6 +110,8 @@ public class TrabajoFinal {
         } else {
             System.out.println("No se encontró ninguna cliente con el DNI: " + dni);
             Cliente cli = new Cliente();
+
+            Incidencia inc = new Incidencia();
 
             String nombre = JOptionPane.showInputDialog("Ingrese el Noombre del cliente");
             String direccion = JOptionPane.showInputDialog("Ingrese el Domicilio del cliente");
@@ -117,37 +125,19 @@ public class TrabajoFinal {
             cli.setDireccion(direccion);
             cli.setNombre(nombre);
 
-
-            Incidencia inc = new Incidencia();
             inc.setEstado(true);
             inc.setCosto(costo);
             inc.setDesc_incidencia(desc);
             inc.setFecha_incidencia(LocalDate.now());
-            inc.addCategoria(cat);
+            tec.addIncidencia(inc);
+            cat.addIncidencia(inc);
             cli.addIncidencia(inc);
 
             session.save(cli);
             session.save(inc);
 
-
         }
         session.getTransaction().commit();
         return cliente;
     }
-
-
-//    private void listEvents() {
-//        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-//        session.beginTransaction();
-//        List<Incidencia> result = (List<Incidencia>) session.createQuery("from Incidencia").list();
-//        session.getTransaction().commit();
-////        List<Incidencia> filteredList = result.stream().filter(incidencia -> incidencia.getFecha_incidencia().after(desde) && incidencia.getFecha_incidencia().before(hasta))
-////                .collect(Collectors.toList());
-//        for (Incidencia e : result) {
-//            System.out.println("Descripcion: " + e.getDesc_incidencia() + "/ Fecha: " + e.getFecha_incidencia() + "/ Costo: "
-//                    + e.getCosto() + "/ Categoria: " + e.getCategorias() + "/ Tecnico: "
-//                    + e.getTecnicos() + "/ Cliente: " + e.getCliente().getNombre());
-//
-//        }
-//    }
 }

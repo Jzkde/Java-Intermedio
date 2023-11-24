@@ -21,26 +21,17 @@ public class Incidencia {
     private LocalDate fecha_incidencia;
     private boolean estado;
 
-    @OneToMany(mappedBy = "incidencia", fetch = FetchType.EAGER)
-    private Set<Categoria> categorias = new HashSet<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria ;
 
-    @OneToMany(mappedBy = "incidencia", fetch = FetchType.EAGER)
-    private Set<Tecnico> tecnicos = new HashSet<>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "tecnico_id")
+    private Tecnico tecnico ;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_dni")
     private Cliente cliente;
 
-    public void addTecnico(Tecnico tecnico) {
-        tecnico.setIncidencia(this);
-        tecnicos.add(tecnico);
-
-    }
-
-    public void addCategoria(Categoria categoria) {
-        categoria.setIncidencia(this);
-        categorias.add(categoria);
-
-    }
 
 }

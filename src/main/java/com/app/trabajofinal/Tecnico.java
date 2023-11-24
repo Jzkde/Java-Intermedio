@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
@@ -15,9 +17,13 @@ public class Tecnico {
     private int id_tecnico;
     private String nombre_tecnico;
 
-    @JoinColumn(name = "incidencia_id")
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Incidencia incidencia;
+    @OneToMany(mappedBy = "tecnico", fetch = FetchType.EAGER)
+    private Set<Incidencia> incidencias = new HashSet<>();
 
+    public void addIncidencia(Incidencia incidencia) {
+        incidencia.setTecnico(this);
+        incidencias.add(incidencia);
+
+    }
 }
 
