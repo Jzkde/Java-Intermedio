@@ -19,6 +19,7 @@ public class Incidencia {
     private String desc_incidencia;
     private float costo;
     private LocalDate fecha_incidencia;
+    //private Estado estado;
     private boolean estado;
 
     @ManyToOne(fetch = FetchType.EAGER)

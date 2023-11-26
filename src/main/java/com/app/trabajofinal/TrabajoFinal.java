@@ -1,136 +1,159 @@
 package com.app.trabajofinal;
 
-
 import org.hibernate.Session;
 
 import javax.swing.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-
 
 public class TrabajoFinal {
 
     public static void main(String[] args) {
-
-
         TrabajoFinal es = new TrabajoFinal();
-
         es.ejemplo2();
     }
 
+    private static List<Incidencia> filtrar(List<Incidencia> lista, LocalDate desde, LocalDate hasta) {
+        List<Incidencia> resultado = new ArrayList<>();
 
-    public void ejemplo2() {
-//         createAndStoreEvent("El Event");
-        int dni = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el DNI del Cliente"));
-        getClienteByDni(dni);
-//         listEvents();
-        HibernateUtil.getSessionFactory().close();
+        for (Incidencia i : lista) {
+            LocalDate fecha = i.getFecha_incidencia();
+            if ((fecha.isEqual(desde) || fecha.isAfter(desde)) &&
+                    (fecha.isEqual(hasta) || fecha.isBefore(hasta))) {
+                resultado.add(i);
+            }
+        }
+        return resultado;
     }
 
-    private void createAndStoreEvent(String title) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
+    public void ejemplo2() {
 
-        Categoria cat = new Categoria();
-        cat.setDesc_categoria("servicio");
+        String area;
+        do {
+            area = JOptionPane.showInputDialog("Sobre qué área desea trabajar? \n" +
+                    "1 -> Cargar una orden \n" +
+                    "2 -> Listar ordenes entre dos fechas\n" +
+                    "3 -> Listar todas las ordenes \n" +
+                    "4 -> Salir");
+            switch (area) {
+                case "1":
+                    int dni = Integer.parseInt(JOptionPane.showInputDialog("Ingrese el DNI del Cliente"));
+                    getClienteByDni(dni);
+                    break;
+                case "2":
+                    listEvents();
+                    break;
+                case "3":
+                    listartodo();
+            }
 
-        Tecnico tec = new Tecnico();
-        tec.setNombre_tecnico("alguien que sabe");
+        } while (!area.equals("4"));
 
-        Incidencia inc = new Incidencia();
-        inc.setEstado(true);
-        inc.setCosto(123);
-        inc.setDesc_incidencia("algo paso");
-        inc.setFecha_incidencia(LocalDate.now());
+        System.out.println("Que tengas un buen día");
 
-        Cliente cli = new Cliente();
-        cli.setDni(143);
-        cli.setMail("n@n.com");
-        cli.setDireccion("un lugar");
-        cli.setNombre("alguien");
-
-        cat.addIncidencia(inc);
-        tec.addIncidencia(inc);
-        cli.addIncidencia(inc);
-
-        session.save(cli);
-        session.save(inc);
-        session.save(tec);
-        session.save(cat);
-
-        session.getTransaction().commit();
+        HibernateUtil.getSessionFactory().close();
     }
 
     private void listEvents() {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
-        List<Incidencia> result = session.createQuery("FROM Incidencia i JOIN FETCH i.tecnico", Incidencia.class).list();
+        List<Incidencia> result = session.createQuery("FROM Incidencia", Incidencia.class).list();
+
+        LocalDate desde = LocalDate.parse(JOptionPane.showInputDialog("Desde que fecha (YYYY-MM-DD)"));
+        LocalDate hasta = LocalDate.parse(JOptionPane.showInputDialog("Hasta que fecha (YYYY-MM-DD)"));
+
+        List<Incidencia> filtrado = filtrar(result, desde, hasta);
 
         session.getTransaction().commit();
 
-        for (Incidencia e : result) {
+        System.out.println("Las ordenes entre " + desde + " y " + hasta + " son: ");
+        for (Incidencia e : filtrado) {
             System.out.println(
                     "/ Cliente: " + e.getCliente().getNombre() +
                             "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
                             "/ Fecha: " + e.getFecha_incidencia() +
                             "/ Categoria: " + e.getCategoria().getDesc_categoria());
         }
+
+    }
+
+    private void listartodo() {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        List<Incidencia> result = session.createQuery("FROM Incidencia", Incidencia.class).list();
+
+
+        session.getTransaction().commit();
+
+        System.out.println("Estas son todas las ordenes");
+        for (Incidencia e : result) {
+            System.out.println(
+                            "/ Cliente: " + e.getCliente().getNombre() +
+                            "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
+                            "/ Fecha: " + e.getFecha_incidencia() +
+                            "/ Categoria: " + e.getCategoria().getDesc_categoria());
+        }
+
     }
 
     private Cliente getClienteByDni(int dni) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
+        int tecnico = Integer.parseInt(JOptionPane.showInputDialog(
+                "Seleccione el Tecnico a cargo\n" +
+                "1 -> Ernesto \n" +
+                "2 -> Jose \n" +
+                "3 -> Ricardo "));
+
+        int categoria = Integer.parseInt(JOptionPane.showInputDialog(
+                "Seleccione la Categoria\n" +
+                "1 -> Reparacion \n" +
+                "2 -> Mantenimiento \n" +
+                "3 -> Reposicion "));
+
         Cliente cliente = session.get(Cliente.class, dni);
-        Categoria cat = session.get(Categoria.class, 1);
-        Tecnico tec = session.get(Tecnico.class, 1);
+        Categoria cat = session.get(Categoria.class, categoria);
+        Tecnico tec = session.get(Tecnico.class, tecnico);
+
+
+        float costo = Float.parseFloat(JOptionPane.showInputDialog("Ingrese el costo del trabajo"));
+        String desc = JOptionPane.showInputDialog("Describa el problema");
+
+        Incidencia inc = new Incidencia();
+        // inc.setEstado(Estado.ACTIVO);
+        inc.setEstado(true);
+        inc.setCosto(costo);
+        inc.setDesc_incidencia(desc);
+        inc.setFecha_incidencia(LocalDate.now());
+
+        cat.addIncidencia(inc);
+        tec.addIncidencia(inc);
 
 
         if (cliente != null) {
-        } else {
+
             System.out.println("Cliente con DNI: " + dni + " encontrado");
-
-            float costo = Float.parseFloat(JOptionPane.showInputDialog("Ingrese el costo de reparacion"));
-            String desc = JOptionPane.showInputDialog("Describa el problema");
-            Incidencia inc = new Incidencia();
-            inc.setEstado(true);
-            inc.setCosto(costo);
-            inc.setDesc_incidencia(desc);
-            inc.setFecha_incidencia(LocalDate.now());
-
-
-            cat.addIncidencia(inc);
-            tec.addIncidencia(inc);
             cliente.addIncidencia(inc);
-
             session.save(inc);
 
-            System.out.println("Incidencia GUARDADA");
+            System.out.println("Orden GUARDADA");
         } else {
             System.out.println("No se encontró ninguna cliente con el DNI: " + dni);
             Cliente cli = new Cliente();
 
-            Incidencia inc = new Incidencia();
-
-            String nombre = JOptionPane.showInputDialog("Ingrese el Noombre del cliente");
-            String direccion = JOptionPane.showInputDialog("Ingrese el Domicilio del cliente");
-            String mail = JOptionPane.showInputDialog("Ingrese el Mail del cliente");
-
-            float costo = Float.parseFloat(JOptionPane.showInputDialog("Ingrese el costo de reparacion"));
-            String desc = JOptionPane.showInputDialog("Describa el problema");
+            String nombre = JOptionPane.showInputDialog("Datos del Cliente: Nombre");
+            String direccion = JOptionPane.showInputDialog("Datos del Cliente: Direccion");
+            String mail = JOptionPane.showInputDialog("Datos del Cliente: Mail");
 
             cli.setDni(dni);
             cli.setMail(mail);
             cli.setDireccion(direccion);
             cli.setNombre(nombre);
 
-            inc.setEstado(true);
-            inc.setCosto(costo);
-            inc.setDesc_incidencia(desc);
-            inc.setFecha_incidencia(LocalDate.now());
-            tec.addIncidencia(inc);
-            cat.addIncidencia(inc);
             cli.addIncidencia(inc);
 
             session.save(cli);
