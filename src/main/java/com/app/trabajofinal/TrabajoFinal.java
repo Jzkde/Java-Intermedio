@@ -71,12 +71,11 @@ public class TrabajoFinal {
         System.out.println("Las ordenes entre " + desde + " y " + hasta + " son: ");
         for (Incidencia e : filtrado) {
             System.out.println(
-                    "/ Cliente: " + e.getCliente().getNombre() +
+                            "/ Cliente: " + e.getCliente().getNombre() +
                             "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
                             "/ Fecha: " + e.getFecha_incidencia() +
                             "/ Categoria: " + e.getCategoria().getDesc_categoria());
         }
-
     }
 
     private void listartodo() {
@@ -84,7 +83,6 @@ public class TrabajoFinal {
         session.beginTransaction();
 
         List<Incidencia> result = session.createQuery("FROM Incidencia", Incidencia.class).list();
-
 
         session.getTransaction().commit();
 
@@ -96,10 +94,9 @@ public class TrabajoFinal {
                             "/ Fecha: " + e.getFecha_incidencia() +
                             "/ Categoria: " + e.getCategoria().getDesc_categoria());
         }
-
     }
 
-    private Cliente getClienteByDni(int dni) {
+    private void getClienteByDni(int dni) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
@@ -133,7 +130,6 @@ public class TrabajoFinal {
         cat.addIncidencia(inc);
         tec.addIncidencia(inc);
 
-
         if (cliente != null) {
 
             System.out.println("Cliente con DNI: " + dni + " encontrado");
@@ -161,6 +157,6 @@ public class TrabajoFinal {
 
         }
         session.getTransaction().commit();
-        return cliente;
+
     }
 }
