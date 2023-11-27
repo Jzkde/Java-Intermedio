@@ -71,7 +71,7 @@ public class TrabajoFinal {
         System.out.println("Las ordenes entre " + desde + " y " + hasta + " son: ");
         for (Incidencia e : filtrado) {
             System.out.println(
-                            "/ Cliente: " + e.getCliente().getNombre() +
+                    "/ Cliente: " + e.getCliente().getNombre() +
                             "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
                             "/ Fecha: " + e.getFecha_incidencia() +
                             "/ Categoria: " + e.getCategoria().getDesc_categoria());
@@ -89,7 +89,7 @@ public class TrabajoFinal {
         System.out.println("Estas son todas las ordenes");
         for (Incidencia e : result) {
             System.out.println(
-                            "/ Cliente: " + e.getCliente().getNombre() +
+                    "/ Cliente: " + e.getCliente().getNombre() +
                             "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
                             "/ Fecha: " + e.getFecha_incidencia() +
                             "/ Categoria: " + e.getCategoria().getDesc_categoria());
@@ -102,15 +102,15 @@ public class TrabajoFinal {
 
         int tecnico = Integer.parseInt(JOptionPane.showInputDialog(
                 "Seleccione el Tecnico a cargo\n" +
-                "1 -> Ernesto \n" +
-                "2 -> Jose \n" +
-                "3 -> Ricardo "));
+                        "1 -> Lucia \n" +
+                        "2 -> Ernesto \n" +
+                        "3 -> Jose "));
 
         int categoria = Integer.parseInt(JOptionPane.showInputDialog(
                 "Seleccione la Categoria\n" +
-                "1 -> Reparacion \n" +
-                "2 -> Mantenimiento \n" +
-                "3 -> Reposicion "));
+                        "1 -> Reparacion \n" +
+                        "2 -> Mantenimiento \n" +
+                        "3 -> Reposicion "));
 
         Cliente cliente = session.get(Cliente.class, dni);
         Categoria cat = session.get(Categoria.class, categoria);
