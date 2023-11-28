@@ -33,6 +33,4 @@ public class Incidencia {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_dni")
     private Cliente cliente;
-
-
 }

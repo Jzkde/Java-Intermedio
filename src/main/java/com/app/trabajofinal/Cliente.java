@@ -25,8 +25,5 @@ public class Cliente {
     public void addIncidencia(Incidencia incidencia) {
         incidencia.setCliente(this);
         incidencias.add(incidencia);
-
     }
-
-
 }

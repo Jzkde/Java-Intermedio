@@ -4,8 +4,8 @@ import org.hibernate.Session;
 
 import javax.swing.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TrabajoFinal {
 
@@ -14,20 +14,7 @@ public class TrabajoFinal {
         es.ejemplo2();
     }
 
-    private static List<Incidencia> filtrar(List<Incidencia> lista, LocalDate desde, LocalDate hasta) {
-        List<Incidencia> resultado = new ArrayList<>();
-
-        for (Incidencia i : lista) {
-            LocalDate fecha = i.getFecha_incidencia();
-            if ((fecha.isEqual(desde) || fecha.isAfter(desde)) &&
-                    (fecha.isEqual(hasta) || fecha.isBefore(hasta))) {
-                resultado.add(i);
-            }
-        }
-        return resultado;
-    }
-
-    public void ejemplo2() {
+       public void ejemplo2() {
 
         String area;
         do {
@@ -54,6 +41,29 @@ public class TrabajoFinal {
 
         HibernateUtil.getSessionFactory().close();
     }
+    private static List<Incidencia> filtrar(List<Incidencia> lista, LocalDate desde, LocalDate hasta) {
+        return lista.stream()
+                .filter(i -> {
+                    LocalDate fecha = i.getFecha_incidencia();
+                    return (fecha.isEqual(desde) || fecha.isAfter(desde)) &&
+                            (fecha.isEqual(hasta) || fecha.isBefore(hasta));
+                })
+                .collect(Collectors.toList());
+    }
+
+
+//    private static List<Incidencia> filtrar(List<Incidencia> lista, LocalDate desde, LocalDate hasta) {
+//        List<Incidencia> resultado = new ArrayList<>();
+//
+//        for (Incidencia i : lista) {
+//            LocalDate fecha = i.getFecha_incidencia();
+//            if ((fecha.isEqual(desde) || fecha.isAfter(desde)) &&
+//                    (fecha.isEqual(hasta) || fecha.isBefore(hasta))) {
+//                resultado.add(i);
+//            }
+//        }
+//        return resultado;
+//    }
 
     private void listEvents() {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -69,13 +79,21 @@ public class TrabajoFinal {
         session.getTransaction().commit();
 
         System.out.println("Las ordenes entre " + desde + " y " + hasta + " son: ");
-        for (Incidencia e : filtrado) {
-            System.out.println(
-                    "/ Cliente: " + e.getCliente().getNombre() +
-                            "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
-                            "/ Fecha: " + e.getFecha_incidencia() +
-                            "/ Categoria: " + e.getCategoria().getDesc_categoria());
-        }
+
+        filtrado.forEach(e -> System.out.println(
+                "/ Cliente: " + e.getCliente().getNombre() +
+                        "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
+                        "/ Fecha: " + e.getFecha_incidencia() +
+                        "/ Categoria: " + e.getCategoria().getDesc_categoria())
+        );
+
+//        for (Incidencia e : filtrado) {
+//            System.out.println(
+//                    "/ Cliente: " + e.getCliente().getNombre() +
+//                            "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
+//                            "/ Fecha: " + e.getFecha_incidencia() +
+//                            "/ Categoria: " + e.getCategoria().getDesc_categoria());
+//        }
     }
 
     private void listartodo() {
@@ -87,13 +105,21 @@ public class TrabajoFinal {
         session.getTransaction().commit();
 
         System.out.println("Estas son todas las ordenes");
-        for (Incidencia e : result) {
-            System.out.println(
-                    "/ Cliente: " + e.getCliente().getNombre() +
-                            "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
-                            "/ Fecha: " + e.getFecha_incidencia() +
-                            "/ Categoria: " + e.getCategoria().getDesc_categoria());
-        }
+
+        result.forEach(e -> System.out.println(
+                "/ Cliente: " + e.getCliente().getNombre() +
+                        "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
+                        "/ Fecha: " + e.getFecha_incidencia() +
+                        "/ Categoria: " + e.getCategoria().getDesc_categoria())
+        );
+
+//        for (Incidencia e : result) {
+//            System.out.println(
+//                    "/ Cliente: " + e.getCliente().getNombre() +
+//                            "/ Tecnico: " + e.getTecnico().getNombre_tecnico() +
+//                            "/ Fecha: " + e.getFecha_incidencia() +
+//                            "/ Categoria: " + e.getCategoria().getDesc_categoria());
+//        }
     }
 
     private void getClienteByDni(int dni) {
@@ -115,7 +141,6 @@ public class TrabajoFinal {
         Cliente cliente = session.get(Cliente.class, dni);
         Categoria cat = session.get(Categoria.class, categoria);
         Tecnico tec = session.get(Tecnico.class, tecnico);
-
 
         float costo = Float.parseFloat(JOptionPane.showInputDialog("Ingrese el costo del trabajo"));
         String desc = JOptionPane.showInputDialog("Describa el problema");

@@ -23,7 +23,6 @@ public class Tecnico {
     public void addIncidencia(Incidencia incidencia) {
         incidencia.setTecnico(this);
         incidencias.add(incidencia);
-
     }
 }
 

@@ -26,7 +26,5 @@ public class Categoria {
     public void addIncidencia(Incidencia incidencia) {
         incidencia.setCategoria(this);
         incidencias.add(incidencia);
-
     }
-
 }
